@@ -39,7 +39,7 @@ def get_article_links(page_url):
 
 
 def fetch_html(url):
-    response = requests.get(url)
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.text
 
@@ -60,8 +60,9 @@ def extract_article_data(html, url):
         title = title_tag.text.strip()
 
     # --- Date Extraction ---
-    data_meta = (soup.find('meta', attrs={'property': 'article:published_time'})
-                 or soup.find('meta', attrs={'property': 'aiturec:datetime'})
+    data_meta = (
+        soup.find('meta', attrs={'property': 'article:published_time'})
+        or soup.find('meta', attrs={'property': 'aiturec:datetime'})
     )
     logging.debug(f'{data_meta = }')
     if data_meta:
