@@ -39,7 +39,7 @@ async def get_article_links(session, page_url):
 
 async def fetch_html(session, url):
     try:
-        async with session.get(url) as response:
+        async with session.get(url, headers=headers) as response:
             return await response.text()
     except (aiohttp.ConnectionError, asyncio.TimeoutError) as err:
         logging.debug(f"Failed to fetch {url}: {err}")
