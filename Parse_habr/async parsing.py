@@ -9,11 +9,12 @@ import sys
 DEBUG_MODE = False
 
 logging.basicConfig(
-    level=logging.DEBUG if DEBUG_MODE else logging.ERROR,
+    level=logging.DEBUG if DEBUG_MODE else logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-KEYWORDS = ['дизайн', 'фото', 'web', 'python']
+
+KEYWORDS = ['sql', 'ai', 'web', 'python']
 BASE_URL = 'https://habr.com'
 ARTICLES_URL = urljoin(BASE_URL, '/ru/articles')
 
@@ -47,7 +48,11 @@ async def fetch_html(session, url):
 
 
 async def extract_article_data(session, url):
+    logging.info(f"Start extract article at: {url}")
     html = await fetch_html(session, url)
+    if not html:
+        logging.error(f'Failed to retrieve HTML for {url}, skipping extraction.')
+        return None
     logging.debug(f'START extract_article_data for: {url}')
     soup = BeautifulSoup(html, 'lxml')
 
@@ -89,14 +94,20 @@ async def extract_article_data(session, url):
     else:
         logging.debug(f'END extract_article_data: keywords didn\'t found in {url}')
         return None
-    print(result)
+    logging.info(result)
 
 
 async def main():
-    async with aiohttp.ClientSession() as session:
-        links = await get_article_links(session, ARTICLES_URL)
-        tasks = [extract_article_data(session, url) for url in links]
-        await asyncio.gather(*tasks)
+    try:
+        async with aiohttp.ClientSession() as session:
+            links = await get_article_links(session, ARTICLES_URL)
+            if not links:
+                logging.warning("No article links found.")
+                return None
+            tasks = [extract_article_data(session, url) for url in links]
+            await asyncio.gather(*tasks)
+    except Exception as err:
+        logging.error(f"Error occured in main: {err}")
 
 
 if __name__ == '__main__':
