@@ -68,12 +68,12 @@ async def extract_article_data(session, url):
         title = title_tag.text.strip()
 
     # --- Date Extraction ---
-    data_meta = (soup.find('meta', attrs={'property': 'article:published_time'})
+    date_meta = (soup.find('meta', attrs={'property': 'article:published_time'})
                  or soup.find('meta', attrs={'property': 'aiturec:datetime'})
                  )
-    logging.debug(f'{data_meta = }')
-    if data_meta:
-        datetime_val = data_meta['content']
+    logging.debug(f'{date_meta = }')
+    if date_meta:
+        datetime_val = date_meta['content']
         art_date = datetime_val[:10]
     else:
         art_date = 'Unknown Date'
@@ -89,10 +89,10 @@ async def extract_article_data(session, url):
 
     # --- Keyword Matching ---
     if any(keyword.lower() in content_text for keyword in KEYWORDS):
-        logging.debug(f'END extract_article_data: keywords found in {url}')
+        logging.debug(f'END extract_article_data: keywords were found in {url}')
         result = f'{art_date} - {title} - {url}'
     else:
-        logging.debug(f'END extract_article_data: keywords didn\'t found in {url}')
+        logging.debug(f'END extract_article_data: keywords weren\'t found in {url}')
         return None
     logging.info(result)
 
