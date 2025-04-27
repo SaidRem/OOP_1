@@ -29,7 +29,8 @@ def test_task_hard_gen():
 
         assert flat_iterator_item == check_item
 
-    assert list(FlatIteratorHardGen(list_of_lists_2)) == ['a', 'b', 'c', 'd', 'e', 'f', 'h', False, 1, 2, None, '!']
+    assert (list(FlatIteratorHardGen(list_of_lists_2))
+            == ['a', 'b', 'c', 'd', 'e', 'f', 'h', False, 1, 2, None, '!'])
     print("Test passed")
 
 
@@ -119,4 +120,3 @@ if __name__ == '__main__':
     test_task_hard_gen()
     test_task_hard()
     test_3()
-
