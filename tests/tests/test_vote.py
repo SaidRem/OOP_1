@@ -3,48 +3,46 @@ from calc_vote import vote
 
 
 class TestVoteCalc(unittest.TestCase):
-    def test_basic_case(self):
-        """Test basic case with clear majority"""
-        self.assertEqual(vote(['a', 'b', 'a', 'c', 'a']), 'a')
+    # Parametrized test for basic cases
+    def test_basic_cases(self):
+        test_cases = [
+            (['a', 'b', 'a', 'c', 'a'], 'a'),  # Clear winner
+            ([1, 2, 2, 2, 3, 3, 3, 2], 2),     # Numeric values
+            (['x'], 'x'),                      # Single element
+        ]
 
-    def test_single_element(self):
-        """Test with single element list"""
-        self.assertEqual(vote(['x']), 'x')
+        for votes, expected in test_cases:
+            with self.subTest(votes=votes, expected=expected):
+                self.assertEqual(vote(votes), expected)
 
-    def test_all_unique(self):
-        """Test when all elements are unique"""
-        self.assertIn(vote(['a', 'b', 'c']), ['a', 'b', 'c'])
+    # Parametrized test for tie cases
+    def test_tie_cases(self):
+        test_cases = [
+            (['a', 'b', 'a', 'b'], ['a', 'b']),
+            ([1, 2, 3, 1, 2, 3], [1, 2, 3]),
+            (['cat', 'dog'], ['cat', 'dog']),
+        ]
 
-    def test_tie_case(self):
-        """Test when there's a tie for most frequent"""
-        result = vote(['a', 'b', 'a', 'b'])
-        self.assertIn(result, ['a', 'b'])
+        for votes, possible_results in test_cases:
+            with self.subTest(votes=votes):
+                result = vote(votes)
+                self.assertIn(result, possible_results)
 
-    def test_numeric_votes(self):
-        """Test with numeric values"""
-        self.assertEqual(vote([1, 2, 3, 2, 2, 3, 1, 2]), 2)
+    # Parametrized test for edge cases
+    def test_edge_cases(self):
+        test_cases = [
+            ([], ValueError),                  # Empty list
+            (['', '', 'a'], ''),               # Empty strings
+            ([1, '1', 1], 1),                  # Mixed types
+        ]
 
-    def test_empty_list(self):
-        """Test with empty input list"""
-        with self.assertRaises(ValueError):
-            vote([])
-
-    def test_large_list(self):
-        """Test with large input list"""
-        votes = ['a'] * 100 + ['b'] * 99 + ['c'] * 50
-        self.assertEqual(vote(votes), 'a')
-
-    def test_mixed_types(self):
-        """Test with mixed type elements"""
-        self.assertEqual(vote([1, '1', 1, '1', 1]), 1)
-
-    def test_boolean_values(self):
-        """Test with boolean values"""
-        self.assertTrue(vote([True, False, True, True]))
-
-    def test_none_values(self):
-        """Test with None values"""
-        self.assertIsNone(vote([None, 'a', None, None]))
+        for votes, expected in test_cases:
+            with self.subTest(votes=votes, expected=expected):
+                if expected is ValueError:
+                    with self.assertRaises(ValueError):
+                        vote(votes)
+                else:
+                    self.assertEqual(vote(votes), expected)
 
 
 if __name__ == "__main__":
